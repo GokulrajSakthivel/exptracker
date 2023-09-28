@@ -45,12 +45,12 @@ public class TransactionController {
 		return customer2;
 	}
 
-//	@PostMapping(value = "createTransaction")
-//	public Transaction createTransaction(@RequestBody Transaction transaction) {
-//
-//		return transactionRepository.save(transaction);
-//
-//	}
+	@PostMapping(value = "createTransaction")
+	public Transaction createTransaction(@RequestBody Transaction transaction) {
+
+		return transactionRepository.save(transaction);
+
+	}
 
 //	@GetMapping(value = "read/{id}")
 //	public Customer readCustomerById(@PathVariable int id) {
