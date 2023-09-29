@@ -5,12 +5,15 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.exptracker.enums.AccountType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -32,11 +35,13 @@ public class Account {
 	@Column(length = 25)
 	private String bankName;
 
-	private String accountType;
+	
+	@Enumerated(EnumType.STRING)
+	private AccountType accountType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id", nullable = false)
-	@JsonBackReference
+	@JsonBackReference(value = "customer_accounts")
 	private Customer customerRef;
 	
 	

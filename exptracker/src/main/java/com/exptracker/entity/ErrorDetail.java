@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ErrorDetail {
 
 	private Date timeStamp;
-	private String message;
+	private List<String> message;
 	private String details;
 
 }
