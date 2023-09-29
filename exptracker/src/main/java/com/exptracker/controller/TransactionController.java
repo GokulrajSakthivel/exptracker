@@ -21,9 +21,6 @@ import com.exptracker.service.ExptrackerInter;
 public class TransactionController {
 
 	@Autowired
-	private CustomerRepository customerRepository;
-
-	@Autowired
 	private AccountRepository accountRepository;
 
 	@Autowired
@@ -34,15 +31,19 @@ public class TransactionController {
 
 	@PostMapping(value = "createCustomer")
 	public Customer createTransaction(@RequestBody Customer customer) {
-
-		Customer customer2 = null;
-		try {
-			customer2 = customerRepository.save(exptrackerInter.createCustomer(customer));
-
-		} catch (CustomerException e) {
-			System.err.println(e.getMessage());
-		}
+		Customer customer2 = exptrackerInter.createCustomer(customer);
 		return customer2;
+	}
+
+	@GetMapping(value = "read/{id}")
+	public Customer readCustomerById(@PathVariable int id) {
+
+		Optional<Customer> findById = customerRepository.findById(exptrackerInter.readCustomerById(id));
+		Customer customer = null;
+		if (findById != null) {
+			customer = findById.get();
+		}
+		return customer;
 	}
 
 	@PostMapping(value = "createTransaction")
@@ -51,20 +52,5 @@ public class TransactionController {
 		return transactionRepository.save(transaction);
 
 	}
-
-//	@GetMapping(value = "read/{id}")
-//	public Customer readCustomerById(@PathVariable int id) {
-//		
-//		Optional<Customer> findById = customerRepository.findById(id);
-//		
-//		Customer customer = null;
-//		
-//		if(findById != null) {
-//			customer = findById.get();
-//		}
-//				
-//		return customer;
-//		
-//	}
 
 }

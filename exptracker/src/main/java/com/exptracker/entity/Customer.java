@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.validator.constraints.Range;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
@@ -25,6 +27,7 @@ public class Customer {
 	@Id
 	
 	@Column(name = "customer_id")
+	
 	private int customerId;
 
 	@Column(length = 30)
