@@ -28,14 +28,13 @@ import lombok.NoArgsConstructor;
 public class Account {
 
 	@Id
-	
+
 	@Column(name = "account_number")
 	private long accountNumber;
 
 	@Column(length = 25)
 	private String bankName;
 
-	
 	@Enumerated(EnumType.STRING)
 	private AccountType accountType;
 
@@ -43,8 +42,7 @@ public class Account {
 	@JoinColumn(name = "customer_id", nullable = false)
 	@JsonBackReference(value = "customer_accounts")
 	private Customer customerRef;
-	
-	
+
 	@JsonManagedReference
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "accountRef")
 	private List<Transaction> transactions;

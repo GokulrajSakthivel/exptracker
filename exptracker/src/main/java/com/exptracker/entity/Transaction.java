@@ -4,11 +4,14 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.exptracker.enums.ExpendetureType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
@@ -22,13 +25,14 @@ import lombok.NoArgsConstructor;
 public class Transaction {
 
 	@Id
-	
+
 	@Column(name = "transaction_Id")
 	private int transactionId;
 
 	private LocalDate transactionDate;
 
-	private String expenditureCategory;
+	@Enumerated(EnumType.STRING)
+	private ExpendetureType ExpendetureType;
 
 	private float credit;
 

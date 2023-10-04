@@ -1,4 +1,4 @@
-package com.exptracker.service;
+package com.exptracker.serviceimpl;
 
 import java.util.Optional;
 
@@ -8,9 +8,10 @@ import org.springframework.stereotype.Service;
 import com.exptracker.entity.Customer;
 import com.exptracker.exception.CustomerException;
 import com.exptracker.repository.CustomerRepository;
+import com.exptracker.service.CustomerService;
 
 @Service
-public class CustomerImpl implements CustomerInter {
+public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -20,10 +21,10 @@ public class CustomerImpl implements CustomerInter {
 
 		Customer customer2 = null;
 		if (customer.getCustomerId() >= 1000 && customer.getCustomerId() <= 9999) {
-			if (customer.getCustomerName().length() >= 3) {
+			if (String.valueOf(customer.getContactNumber()).length() == 10) {
 				customer2 = customerRepository.save(customer);
 			} else {
-				throw new CustomerException(" Invalid Customer Name ");
+				throw new CustomerException(" Enter Valid Contact Number ");
 			}
 		} else {
 			throw new CustomerException(" Invalid Customer ID ");
@@ -45,36 +46,42 @@ public class CustomerImpl implements CustomerInter {
 	}
 
 	@Override
-	public String updateCustomer(Customer customer, int custId) throws CustomerException {
+	public String updateCustomer(Customer customer) throws CustomerException {
 
-		Customer customer2 = new Customer();
-
-		Optional<Customer> data = customerRepository.findById(custId);
+		Optional<Customer> data = customerRepository.findById(customer.getCustomerId());
+		
+		Customer updatedCustomer = new Customer();
 
 		String message = "";
-		if (data.isPresent()) {
-			customer2.setCustomerName(customer.getCustomerName());
-			customer2.setContactNumber(customer.getContactNumber());
-			customerRepository.save(customer2);
-			message = "Updated Successfully";
+		if (String.valueOf(customer.getContactNumber()).length() == 10) {
+			if (data.isPresent()) {
+				Customer existingCustomer = customerRepository.findById(customer.getCustomerId()).get();
+				updatedCustomer.setCustomerId(existingCustomer.getCustomerId());
+				updatedCustomer.setCustomerName(customer.getCustomerName());
+				updatedCustomer.setContactNumber(customer.getContactNumber());
+				customerRepository.save(updatedCustomer);
+				message = "Updated Successfully";
+			} else {
+				throw new CustomerException("Customer not found for ID : " + customer.getCustomerId());
+			}
+			return message;
 		} else {
-			throw new CustomerException("Customer not found for ID: " + customer.getCustomerId());
+			throw new CustomerException(" Enter Valid Contact Number ");
 		}
-		return message;
+
 	}
 
 	@Override
 	public String deleteCustomer(int custId) throws CustomerException {
 
-		Customer customer2 = readCustomerById(custId);
+		Optional<Customer>  optional= customerRepository.findById(custId);
 		String message = "";
-		if (customer2 != null) {
-			customerRepository.delete(customer2);
+		if (optional.isPresent()) {
+			customerRepository.delete(optional.get());
 			message = " Deleted Successfully";
 		} else {
 			throw new CustomerException("Customer not found for ID: " + custId);
 		}
-
 		return message;
 	}
 
