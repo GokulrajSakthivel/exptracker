@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +25,11 @@ public class Customer {
 
 	@Id
 	private int customerId;
+	
+	@NotBlank(message = "username should not Empty ")
+	private String userName;
+	
+	private String password;
 
 	@Column(length = 30)
 	private String customerName;
@@ -32,5 +39,5 @@ public class Customer {
 	@JsonManagedReference(value = "customer_accounts")
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "customerRef")
 	private List<Account> accounts;
-
+	
 }

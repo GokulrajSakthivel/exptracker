@@ -56,19 +56,20 @@ public class AddressServiceImpl implements AddressService {
 	public String updateAddress(Address address) throws CustomerException {
 
 		
-		Optional<Address> optional = addressRepository.findById(address.getDoorNo());
+		Optional<Address> optional = addressRepository.findById(address.getAddressId());
 		Address updatedAddress = new Address();
 
 		if (optional.isPresent()) {
-			Address existingAddress = addressRepository.findById(address.getDoorNo()).get();
-			updatedAddress.setDoorNo(existingAddress.getDoorNo());
+			Address existingAddress = addressRepository.findById(address.getAddressId()).get();
+			updatedAddress.setAddressId(existingAddress.getAddressId());
+			updatedAddress.setDoorNo(address.getDoorNo());
 			updatedAddress.setCity(address.getCity());
 			updatedAddress.setPinCode(address.getPinCode());
 			updatedAddress.setState(address.getState());
 			updatedAddress.setStreetName(address.getStreetName());
 			updatedAddress.setCustomerRef(existingAddress.getCustomerRef());
 			addressRepository.save(updatedAddress);
-			return "Address Created Successfully";
+			return "Address Updated Successfully";
 		} else {
 			throw new CustomerException(" Address ID (or) Door Number Not found ");
 		}
@@ -76,8 +77,8 @@ public class AddressServiceImpl implements AddressService {
 	}
 
 	@Override
-	public String deleteAddressByDoorNumber(int doorNo) throws CustomerException {
-		Optional<Address> optional = addressRepository.findById(doorNo);
+	public String deleteAddressByDoorNumber(int addressId) throws CustomerException {
+		Optional<Address> optional = addressRepository.findById(addressId);
 		if (optional.isPresent()) {
 			addressRepository.delete(optional.get());
 			return "Deleted Successfully";

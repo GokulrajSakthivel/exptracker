@@ -38,7 +38,6 @@ public class TransactionController {
 	@GetMapping(value = "overAllTransaction/{accNumber}")
 	public float getAllTransactionByAccNumber(@PathVariable long accNumber) {
 		return transactionService.overallTransactionByBank(accNumber);
-
 	}
 
 	@GetMapping(value = "totalTransaction/{accNumber}/{expenditureType}")

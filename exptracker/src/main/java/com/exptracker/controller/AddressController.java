@@ -40,9 +40,9 @@ public class AddressController {
 		return new ResponseEntity<>(addressService.updateAddress(address), HttpStatus.ACCEPTED);
 	}
 
-	@DeleteMapping(value = "deleteAddress/{doorNo}")
-	public ResponseEntity<String> deleteAddress(@PathVariable int doorNo) {
-		return new ResponseEntity<>(addressService.deleteAddressByDoorNumber(doorNo), HttpStatus.ACCEPTED);
+	@DeleteMapping(value = "deleteAddress/{addressId}")
+	public ResponseEntity<String> deleteAddress(@PathVariable int addressId) {
+		return new ResponseEntity<>(addressService.deleteAddressByDoorNumber(addressId), HttpStatus.ACCEPTED);
 
 	}
 }

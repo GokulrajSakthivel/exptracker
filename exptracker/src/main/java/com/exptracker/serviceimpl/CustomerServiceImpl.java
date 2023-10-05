@@ -1,14 +1,14 @@
 package com.exptracker.serviceimpl;
-
 import java.util.Optional;
-
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.exptracker.dto.CustomerDto;
 import com.exptracker.entity.Customer;
 import com.exptracker.exception.CustomerException;
 import com.exptracker.repository.CustomerRepository;
 import com.exptracker.service.CustomerService;
+
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -49,13 +49,15 @@ public class CustomerServiceImpl implements CustomerService {
 	public String updateCustomer(Customer customer) throws CustomerException {
 
 		Optional<Customer> data = customerRepository.findById(customer.getCustomerId());
-		
+
 		Customer updatedCustomer = new Customer();
 
 		String message = "";
 		if (String.valueOf(customer.getContactNumber()).length() == 10) {
 			if (data.isPresent()) {
 				Customer existingCustomer = customerRepository.findById(customer.getCustomerId()).get();
+				updatedCustomer.setUserName(customer.getUserName());
+				updatedCustomer.setPassword(customer.getPassword());
 				updatedCustomer.setCustomerId(existingCustomer.getCustomerId());
 				updatedCustomer.setCustomerName(customer.getCustomerName());
 				updatedCustomer.setContactNumber(customer.getContactNumber());
@@ -74,7 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public String deleteCustomer(int custId) throws CustomerException {
 
-		Optional<Customer>  optional= customerRepository.findById(custId);
+		Optional<Customer> optional = customerRepository.findById(custId);
 		String message = "";
 		if (optional.isPresent()) {
 			customerRepository.delete(optional.get());
@@ -85,4 +87,18 @@ public class CustomerServiceImpl implements CustomerService {
 		return message;
 	}
 
+	@Override
+	public CustomerDto loginCustomer(String userName, String password) throws CustomerException {
+		ModelMapper mapper = new ModelMapper();
+		Customer customer = customerRepository.findByUserNameAndPassword(userName, password);
+		CustomerDto  dtoModel = null;
+		if(customer != null) {
+			dtoModel = mapper.map(customer, CustomerDto.class);
+			return dtoModel;
+		}
+		else {
+			throw new CustomerException("Invalid Username or Password ");
+		}
+	}
+	
 }

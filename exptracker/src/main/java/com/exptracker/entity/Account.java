@@ -37,6 +37,8 @@ public class Account {
 
 	@Enumerated(EnumType.STRING)
 	private AccountType accountType;
+	
+	private float accountBalance; 
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id", nullable = false)

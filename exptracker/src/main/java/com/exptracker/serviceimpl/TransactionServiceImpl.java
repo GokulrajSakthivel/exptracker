@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.exptracker.entity.Account;
+import com.exptracker.entity.Customer;
 import com.exptracker.entity.Transaction;
 import com.exptracker.enums.ExpendetureType;
 import com.exptracker.exception.CustomerException;
 import com.exptracker.repository.AccountRepository;
+import com.exptracker.repository.CustomerRepository;
 import com.exptracker.repository.TransactionRepository;
 import com.exptracker.service.TransactionService;
 
@@ -22,15 +23,32 @@ public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	private AccountRepository accountRepository;
 
+	@Autowired
+	private CustomerRepository customerRepository;
+
 	@Override
 	public Transaction createTransaction(Transaction transaction) throws CustomerException {
+		Optional<Account> optional = accountRepository.findById(transaction.getAccountRef().getAccountNumber());
+		Account account = optional.get();
 		Transaction transaction2 = null;
-		if (transaction.getCredit() != 0 || transaction.getWithdrawal() != 0) {
-			transaction2 = transactionRepository.save(transaction);
+		if (optional.isPresent()) {
+			if (transaction.getCredit() != 0.0) {
+				account.setAccountBalance(account.getAccountBalance() + transaction.getCredit());
+				accountRepository.save(account);
+				transaction.setClosingBalance(account.getAccountBalance());
+				transaction2 = transactionRepository.save(transaction);
+			} else if (transaction.getWithdrawal() != 0.0) {
+				account.setAccountBalance(account.getAccountBalance() - transaction.getWithdrawal());
+				accountRepository.save(account);
+				transaction.setClosingBalance(account.getAccountBalance());
+				transaction2 = transactionRepository.save(transaction);
+			} else {
+				throw new CustomerException("Something went wrong or invalid Transaction");
+			}
+			return transaction2;
 		} else {
-			throw new CustomerException(" Invalid Credit (or) withdraw amount ");
+			throw new CustomerException("Invalid Account Number");
 		}
-		return transaction2;
 	}
 
 	@Override
@@ -59,8 +77,7 @@ public class TransactionServiceImpl implements TransactionService {
 			transaction2.setLocation(transaction.getLocation());
 			transaction2.setOtherDetails(transaction.getOtherDetails());
 			message = "Transaction Created Successfully ";
-			
-			
+
 		} else {
 			throw new CustomerException("Transaction not found for ID: " + transaction.getTransactionId());
 		}
@@ -84,7 +101,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public float overallTransactionByBank(long accNumber) throws CustomerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
-		
+
 		float total = 0;
 		if (accountOptional.isPresent()) {
 			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
@@ -98,9 +115,10 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public float overallTransactionByExpenditureType(long accNumber, ExpendetureType expendityreType) throws CustomerException {
+	public float overallTransactionByExpenditureType(long accNumber, ExpendetureType expendityreType)
+			throws CustomerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
-		
+
 		float total = 0;
 		if (accountOptional.isPresent()) {
 			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
@@ -110,10 +128,8 @@ public class TransactionServiceImpl implements TransactionService {
 				}
 			}
 			return total;
-
 		} else {
 			throw new CustomerException("Account Not found for given Account Number : " + accNumber);
 		}
-
 	}
 }

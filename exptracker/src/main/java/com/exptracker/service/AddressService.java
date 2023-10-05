@@ -13,6 +13,6 @@ public interface AddressService {
 
 	public String updateAddress(Address address) throws CustomerException;
 
-	public String deleteAddressByDoorNumber(int doorNo) throws CustomerException;
+	public String deleteAddressByDoorNumber(int addressId) throws CustomerException;
 
 }
