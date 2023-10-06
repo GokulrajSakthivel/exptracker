@@ -67,7 +67,7 @@ public class AddressServiceImpl implements AddressService {
 			updatedAddress.setPinCode(address.getPinCode());
 			updatedAddress.setState(address.getState());
 			updatedAddress.setStreetName(address.getStreetName());
-			updatedAddress.setCustomerRef(existingAddress.getCustomerRef());
+			updatedAddress.setCustomer(existingAddress.getCustomer());
 			addressRepository.save(updatedAddress);
 			return "Address Updated Successfully";
 		} else {

@@ -1,5 +1,7 @@
 package com.exptracker.serviceimpl;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +30,41 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public Transaction createTransaction(Transaction transaction) throws CustomerException {
-		Optional<Account> optional = accountRepository.findById(transaction.getAccountRef().getAccountNumber());
-		Account account = optional.get();
-		Transaction transaction2 = null;
-		if (optional.isPresent()) {
-			if (transaction.getCredit() != 0.0) {
+
+		Optional<Account> optionals = accountRepository.findById(transaction.getAccountRef().getAccountNumber());
+
+		if (optionals.isPresent()) {
+			Account account = optionals.get();
+
+			if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() == 0.0) {
+				throw new CustomerException("Something went wrong or invalid Transaction");
+			}
+
+			if (transaction.getCredit() != 0.0 && transaction.getWithdrawal() == 0.0) {
 				account.setAccountBalance(account.getAccountBalance() + transaction.getCredit());
 				accountRepository.save(account);
 				transaction.setClosingBalance(account.getAccountBalance());
-				transaction2 = transactionRepository.save(transaction);
-			} else if (transaction.getWithdrawal() != 0.0) {
-				account.setAccountBalance(account.getAccountBalance() - transaction.getWithdrawal());
-				accountRepository.save(account);
-				transaction.setClosingBalance(account.getAccountBalance());
-				transaction2 = transactionRepository.save(transaction);
-			} else {
-				throw new CustomerException("Something went wrong or invalid Transaction");
+				transaction.setTransactionDate(LocalDate.now());
 			}
+
+			if (account.getAccountBalance() >= transaction.getWithdrawal()) {
+				if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() != 0.0) {
+					account.setAccountBalance(account.getAccountBalance() - transaction.getWithdrawal());
+					accountRepository.save(account);
+					transaction.setClosingBalance(account.getAccountBalance());
+					transaction.setTransactionDate(LocalDate.now());
+				}
+			} else {
+				throw new CustomerException("Insufficient Account Balance ");
+			}
+
+			Transaction transaction2 = transactionRepository.save(transaction);
 			return transaction2;
+
 		} else {
 			throw new CustomerException("Invalid Account Number");
 		}
+
 	}
 
 	@Override
@@ -99,9 +115,8 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public float overallTransactionByBank(long accNumber) throws CustomerException {
+	public float totalTransactionByBank(long accNumber) throws CustomerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
-
 		float total = 0;
 		if (accountOptional.isPresent()) {
 			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
@@ -115,10 +130,9 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public float overallTransactionByExpenditureType(long accNumber, ExpendetureType expendityreType)
+	public float totalTransactionByExpenditureType(long accNumber, ExpendetureType expendityreType)
 			throws CustomerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
-
 		float total = 0;
 		if (accountOptional.isPresent()) {
 			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
@@ -132,4 +146,26 @@ public class TransactionServiceImpl implements TransactionService {
 			throw new CustomerException("Account Not found for given Account Number : " + accNumber);
 		}
 	}
+
+	@Override
+	public List<Transaction> overallTransactionByBank(long accNumber) throws CustomerException {
+		Optional<Account> optional = accountRepository.findById(accNumber);
+		List<Transaction> list = null;
+		if (optional.isPresent()) {
+			list = optional.get().getTransactions();
+			if (list != null) {
+				return list;
+			} else {
+				throw new CustomerException("No Transaction found for given Account Number  " + accNumber);
+			}
+		} else {
+			throw new CustomerException("Account Not found for given Account Number : " + accNumber);
+		}
+
+//		List<Long> accountNumbers = new ArrayList<Long>();
+//		accountNumbers.add(accNumber);
+//		accountRepository.findAllById(accountNumbers);
+//		return null;
+	}
+
 }

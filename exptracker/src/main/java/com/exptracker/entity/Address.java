@@ -1,10 +1,14 @@
 package com.exptracker.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -20,6 +24,7 @@ import lombok.NoArgsConstructor;
 public class Address {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int addressId;
 
 	private int doorNo;
@@ -35,9 +40,8 @@ public class Address {
 
 	private int pinCode;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "customer_id", nullable = false)
-	@JsonBackReference
-	private Customer customerRef;
+	@ManyToOne
+	@JoinColumn(name = "customer_id" , nullable = false)
+	private Customer customer;
 
 }

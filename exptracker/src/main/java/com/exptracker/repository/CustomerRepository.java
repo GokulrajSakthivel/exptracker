@@ -7,5 +7,6 @@ import com.exptracker.entity.Customer;
 
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 	Customer findByUserNameAndPassword(String userName , String password);
+	boolean existsByUserNameAndPassword(String userName, String password);
 
 }

@@ -1,5 +1,7 @@
 package com.exptracker.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,14 +37,19 @@ public class TransactionController {
 		return transactionService.deleteTransactionByTransactionId(transactionId);
 	}
 
-	@GetMapping(value = "overAllTransaction/{accNumber}")
+	@GetMapping(value = "totalTransaction/{accNumber}")
 	public float getAllTransactionByAccNumber(@PathVariable long accNumber) {
-		return transactionService.overallTransactionByBank(accNumber);
+		return transactionService.totalTransactionByBank(accNumber);
 	}
 
 	@GetMapping(value = "totalTransaction/{accNumber}/{expenditureType}")
 	public float getAllTransactionByAccNumber(@PathVariable int accNumber, @PathVariable ExpendetureType expenditureType) {
-		return transactionService.overallTransactionByExpenditureType(accNumber, expenditureType);
+		return transactionService.totalTransactionByExpenditureType(accNumber, expenditureType);
+	}
+	
+	@GetMapping("overAllTransaction/{accNumber}")
+	public List<Transaction> overAllTransactionsByAccountNumber(@PathVariable long accNumber){
+		return transactionService.overallTransactionByBank(accNumber);
 	}
 
 }

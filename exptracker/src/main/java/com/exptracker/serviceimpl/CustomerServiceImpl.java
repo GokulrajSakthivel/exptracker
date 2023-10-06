@@ -1,4 +1,6 @@
 package com.exptracker.serviceimpl;
+
+import java.util.List;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,28 +11,34 @@ import com.exptracker.exception.CustomerException;
 import com.exptracker.repository.CustomerRepository;
 import com.exptracker.service.CustomerService;
 
-
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private CustomerRepository customerRepository;
 
+	@Autowired
+	private ModelMapper mapper;
+
 	@Override
 	public Customer createCustomer(Customer customer) throws CustomerException {
 
-		Customer customer2 = null;
-		if (customer.getCustomerId() >= 1000 && customer.getCustomerId() <= 9999) {
-			if (String.valueOf(customer.getContactNumber()).length() == 10) {
-				customer2 = customerRepository.save(customer);
-			} else {
-				throw new CustomerException(" Enter Valid Contact Number ");
-			}
-		} else {
-			throw new CustomerException(" Invalid Customer ID ");
+		if (String.valueOf(customer.getContactNumber()).length() != 10) {
+			throw new CustomerException("Enter a valid 10-digit contact number");
 		}
-		return customer2;
+
+		boolean isDuplicate = customerRepository.existsByUserNameAndPassword(customer.getUserName(),
+				customer.getPassword());
+
+		if (isDuplicate) {
+			throw new CustomerException("Username and password already exist");
+		}
+
+		Customer savedCustomer = customerRepository.save(customer);
+		return savedCustomer;
 	}
+
+
 
 	@Override
 	public Customer readCustomerById(int CustId) throws CustomerException {
@@ -89,16 +97,20 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public CustomerDto loginCustomer(String userName, String password) throws CustomerException {
-		ModelMapper mapper = new ModelMapper();
-		Customer customer = customerRepository.findByUserNameAndPassword(userName, password);
-		CustomerDto  dtoModel = null;
-		if(customer != null) {
-			dtoModel = mapper.map(customer, CustomerDto.class);
+
+		Customer customers = customerRepository.findByUserNameAndPassword(userName, password);
+		CustomerDto dtoModel = null;
+		List<Customer> customer = customerRepository.findAll();
+
+		boolean isDuplicate = customer.stream().anyMatch(
+				customer1 -> customer1.getUserName().equals(userName) && customer1.getPassword().equals(password));
+
+		if (isDuplicate) {
+			dtoModel = mapper.map(customers, CustomerDto.class);
 			return dtoModel;
-		}
-		else {
+		} else {
 			throw new CustomerException("Invalid Username or Password ");
 		}
 	}
-	
+
 }

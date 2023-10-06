@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.exptracker.entity.Account;
+import com.exptracker.entity.Customer;
 import com.exptracker.exception.CustomerException;
 import com.exptracker.repository.AccountRepository;
+import com.exptracker.repository.CustomerRepository;
 import com.exptracker.service.AccountService;
 
 @Service
@@ -16,18 +18,24 @@ public class AccountServiceImpl implements AccountService {
 	@Autowired
 	private AccountRepository accountRepository;
 
+	@Autowired
+	private CustomerRepository customerRepository;
+
 	@Override
 	public Account createAccount(Account account) throws CustomerException {
 		Account account2 = null;
-		if (account.getAccountNumber() >= 1000) {
-			if (account.getBankName().length() >= 3) {
-				account2 = accountRepository.save(account);
-			} else {
-				throw new CustomerException("Invalid Bank Name");
-			}
-		} else {
-			throw new CustomerException("Invalid account number :" + account.getAccountNumber());
+
+		if (account.getBankName().length() <= 3) {
+			throw new CustomerException("Invalid Bank Name");
 		}
+
+		Optional<Customer> optional = customerRepository.findById(account.getCustomerRef().getCustomerId());
+		
+		if(!optional.isPresent()) {
+			throw new CustomerException(" Invalid Customer ID ");
+		}
+
+		account2 = accountRepository.save(account);
 		return account2;
 	}
 
@@ -48,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
 		Optional<Account> optional = accountRepository.findById(account.getAccountNumber());
 		Account UpdatedAccount = new Account();
 		if (optional.isPresent()) {
-			
+
 			Account existingAccount = accountRepository.findById(account.getAccountNumber()).get();
 			UpdatedAccount.setAccountNumber(existingAccount.getAccountNumber());
 			UpdatedAccount.setBankName(existingAccount.getBankName());
@@ -59,11 +67,8 @@ public class AccountServiceImpl implements AccountService {
 		} else {
 			throw new CustomerException(" Account Number Not Found :" + account.getAccountNumber());
 		}
-		
 
 	}
-
-
 
 	@Override
 	public String deleteAccountByAccNumber(long accNumber) throws CustomerException {
