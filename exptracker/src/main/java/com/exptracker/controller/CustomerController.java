@@ -1,6 +1,8 @@
 package com.exptracker.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,28 +22,28 @@ public class CustomerController {
 	private CustomerService customerService;
 
 	@PostMapping(value = "createCustomer")
-	public Customer createTransaction(@RequestBody Customer customer) {
-		return customerService.createCustomer(customer);
+	public ResponseEntity<Customer> createTransaction(@RequestBody Customer customer) {
+		return new ResponseEntity<>(customerService.createCustomer(customer),HttpStatus.CREATED);
 	}
 
 	@GetMapping(value = "readCustomer/{id}")
-	public Customer readCustomerById(@PathVariable int id) {
-		Customer findById = customerService.readCustomerById(id);
-		return findById;
+	public ResponseEntity<Customer> readCustomerById(@PathVariable int id) {
+		return new ResponseEntity<>(customerService.readCustomerById(id),HttpStatus.OK);
+		
 	}
 
-	@PutMapping(value = "updateCustomer")
-	public String updateCustomerById(@RequestBody Customer customer) {
-		return customerService.updateCustomer(customer);
+	@PutMapping(value = "updateCustomer/{customerId}")
+	public ResponseEntity<String> updateCustomerById(@RequestBody Customer customer , @PathVariable  int customerId) {
+		return new ResponseEntity<>(customerService.updateCustomer(customer,customerId),HttpStatus.ACCEPTED);
 	}
 
 	@DeleteMapping(value = "deleteCustomerById/{id}")
-	public String deleteCustomer(@PathVariable int id) {
-		return customerService.deleteCustomer(id);
+	public ResponseEntity<String> deleteCustomer(@PathVariable int id) {
+		return new ResponseEntity<>(customerService.deleteCustomer(id),HttpStatus.ACCEPTED);
 	}
 	
 	@GetMapping(value = "loginCustomer/{userName}/{password}")
-	public CustomerDto loginCustomer(@PathVariable String userName , @PathVariable String password) {
-		return customerService.loginCustomer(userName, password);
+	public ResponseEntity<CustomerDto> loginCustomer(@PathVariable String userName , @PathVariable String password) {
+		return new ResponseEntity<>(customerService.loginCustomer(userName, password),HttpStatus.OK);
 	}
 }

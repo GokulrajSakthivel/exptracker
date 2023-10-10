@@ -1,11 +1,11 @@
 package com.exptracker.exception;
 
-public class CustomerException extends RuntimeException {
+public class TrackerException extends RuntimeException {
 
 	private String errorMessage;
 
 	
-	public CustomerException(String errorMessage) {
+	public TrackerException(String errorMessage) {
 		super();
 		this.errorMessage = errorMessage;
 	}

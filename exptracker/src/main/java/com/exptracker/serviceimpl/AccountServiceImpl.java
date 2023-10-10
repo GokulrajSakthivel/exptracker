@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.exptracker.entity.Account;
 import com.exptracker.entity.Customer;
-import com.exptracker.exception.CustomerException;
+import com.exptracker.exception.TrackerException;
 import com.exptracker.repository.AccountRepository;
 import com.exptracker.repository.CustomerRepository;
 import com.exptracker.service.AccountService;
@@ -22,64 +22,60 @@ public class AccountServiceImpl implements AccountService {
 	private CustomerRepository customerRepository;
 
 	@Override
-	public Account createAccount(Account account) throws CustomerException {
-		Account account2 = null;
-
-		if (account.getBankName().length() <= 3) {
-			throw new CustomerException("Invalid Bank Name");
-		}
+	public Account createAccount(Account account) throws TrackerException {
 
 		Optional<Customer> optional = customerRepository.findById(account.getCustomerRef().getCustomerId());
+		if (!optional.isPresent()) {
+			throw new TrackerException(" Invalid Customer ID ");
+		}
+
+		if (account.getBankName().length() <= 3) {
+			throw new TrackerException("Invalid Bank Name");
+		}
+
 		
-		if(!optional.isPresent()) {
-			throw new CustomerException(" Invalid Customer ID ");
-		}
-
-		account2 = accountRepository.save(account);
-		return account2;
+		return  accountRepository.save(account);
 	}
 
 	@Override
-	public Account readAccountByAccNumber(long accNumber) throws CustomerException {
+	public Account readAccountByAccNumber(long accNumber) throws TrackerException {
 		Optional<Account> optional = accountRepository.findById(accNumber);
-		Account account = null;
-		if (optional.isPresent()) {
-			account = optional.get();
-		} else {
-			throw new CustomerException("Account Not found  :" + accNumber);
+		if (!optional.isPresent()) {
+			throw new TrackerException("Account Not found  :" + accNumber);	
 		}
-		return account;
+		return optional.get();
 	}
 
 	@Override
-	public String updateAccount(Account account) throws CustomerException {
-		Optional<Account> optional = accountRepository.findById(account.getAccountNumber());
-		Account UpdatedAccount = new Account();
-		if (optional.isPresent()) {
+	public String updateAccount(Account account, long accountNumber) throws TrackerException {
 
-			Account existingAccount = accountRepository.findById(account.getAccountNumber()).get();
-			UpdatedAccount.setAccountNumber(existingAccount.getAccountNumber());
-			UpdatedAccount.setBankName(existingAccount.getBankName());
-			UpdatedAccount.setAccountType(account.getAccountType());
-			UpdatedAccount.setCustomerRef(existingAccount.getCustomerRef());
-			accountRepository.save(UpdatedAccount);
-			return "Updated Successfully";
-		} else {
-			throw new CustomerException(" Account Number Not Found :" + account.getAccountNumber());
+//		Optional<Customer> customerOptional = customerRepository.findById(account.getCustomerRef().getCustomerId());
+//		if (!customerOptional.isPresent()) {
+//			throw new CustomerException(" Invalid Customer ID ");
+//		}
+
+		Optional<Account> optional = accountRepository.findById(accountNumber);
+		if (!optional.isPresent()) {
+			throw new TrackerException(" Account Number Not Found :" + accountNumber);
 		}
 
+		Account existingAccount = optional.get();
+
+		existingAccount.setAccountBalance(account.getAccountBalance());
+		existingAccount.setBankName(account.getBankName());
+		existingAccount.setAccountType(account.getAccountType());
+
+		accountRepository.save(existingAccount);
+		return "Updated Successfully";
 	}
 
 	@Override
-	public String deleteAccountByAccNumber(long accNumber) throws CustomerException {
-		Account account = readAccountByAccNumber(accNumber);
-		String message = "";
-		if (account != null) {
-			accountRepository.delete(account);
-			message = " Deleted Successfully";
-		} else {
-			throw new CustomerException("Account not found for account Number : " + accNumber);
+	public String deleteAccountByAccNumber(long accNumber) throws TrackerException {
+		Optional<Account> optional = accountRepository.findById(accNumber);
+		if (!optional.isPresent()) {
+			throw new TrackerException("Account not found for account Number : " + accNumber);
 		}
-		return message;
+		accountRepository.delete(optional.get());
+		return " Deleted Successfully";
 	}
 }

@@ -5,8 +5,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.exptracker.entity.Address;
-import com.exptracker.exception.CustomerException;
+import com.exptracker.entity.Customer;
+import com.exptracker.exception.TrackerException;
 import com.exptracker.repository.AddressRepository;
+import com.exptracker.repository.CustomerRepository;
 import com.exptracker.service.AddressService;
 
 @Service
@@ -15,76 +17,81 @@ public class AddressServiceImpl implements AddressService {
 	@Autowired
 	private AddressRepository addressRepository;
 
+	@Autowired
+	private CustomerRepository customerRepository;
+
 	@Override
-	public Address createAddress(Address address) throws CustomerException {
-		Address address2 = null;
-		if (address.getDoorNo() >= 1000) {
-			if (address.getState().length() >= 3) {
-				address2 = addressRepository.save(address);
-			} else {
-				throw new CustomerException(" Invalid State Name :" + address.getState());
-			}
-		} else {
-			throw new CustomerException(" Invalid Door Number " + address.getDoorNo());
+	public Address createAddress(Address address) throws TrackerException {
+
+		Optional<Customer> optional = customerRepository.findById(address.getCustomer().getCustomerId());
+		if (!optional.isPresent()) {
+			throw new TrackerException(" Invalid Customer ID ");
 		}
-		return address2;
+
+		if (String.valueOf(address.getPinCode()).length() == 6) {
+			throw new TrackerException("Enter a valid 6-digit Pin Code");
+		}
+
+		return addressRepository.save(address);
 	}
 
 	@Override
-	public List<Address> readAddressByPincode(int pincode) throws CustomerException {
+	public List<Address> readAddressByPincode(int pincode) throws TrackerException {
 		List<Address> address = addressRepository.findAllByPinCode(pincode);
 		if (!address.isEmpty()) {
 			return address;
 		} else {
-			throw new CustomerException("Address Not found for Pincode : " + pincode);
+			throw new TrackerException("Address Not found for Pincode : " + pincode);
 		}
 	}
 
 	@Override
-	public Address readAddressById(int doorNo) throws CustomerException {
-		if (addressRepository.findById(doorNo).isPresent()) {
-			Optional<Address> optional = addressRepository.findById(doorNo);
-			Address address = optional.get();
-			return address;
-		} else {
-			throw new CustomerException("Address Not found for doorNumber : " + doorNo);
+	public Address readAddressByDoorNo(int doorNo) throws TrackerException {
+		Optional<Address> optional = addressRepository.findById(doorNo);
+		if (!optional.isPresent()) {
+			throw new TrackerException("Address Not found for doorNumber : " + doorNo);
 		}
-
+		return optional.get();
 	}
 
 	@Override
-	public String updateAddress(Address address) throws CustomerException {
+	public String updateAddress(Address address, int addressId) throws TrackerException {
 
-		
-		Optional<Address> optional = addressRepository.findById(address.getAddressId());
-		Address updatedAddress = new Address();
+//		Optional<Customer> customerOptional = customerRepository.findById(address.getCustomer().getCustomerId());
+//		if (!customerOptional.isPresent()) {
+//			throw new CustomerException(" Invalid Customer ID ");
+//		}
 
-		if (optional.isPresent()) {
-			Address existingAddress = addressRepository.findById(address.getAddressId()).get();
-			updatedAddress.setAddressId(existingAddress.getAddressId());
-			updatedAddress.setDoorNo(address.getDoorNo());
-			updatedAddress.setCity(address.getCity());
-			updatedAddress.setPinCode(address.getPinCode());
-			updatedAddress.setState(address.getState());
-			updatedAddress.setStreetName(address.getStreetName());
-			updatedAddress.setCustomer(existingAddress.getCustomer());
-			addressRepository.save(updatedAddress);
-			return "Address Updated Successfully";
-		} else {
-			throw new CustomerException(" Address ID (or) Door Number Not found ");
-		}
-
-	}
-
-	@Override
-	public String deleteAddressByDoorNumber(int addressId) throws CustomerException {
 		Optional<Address> optional = addressRepository.findById(addressId);
-		if (optional.isPresent()) {
-			addressRepository.delete(optional.get());
-			return "Deleted Successfully";
-		} else {
-			throw new CustomerException("Address Not found (or) Invalid Door Number");
+		if (!optional.isPresent()) {
+			throw new TrackerException(" Address ID Not found ");
 		}
+
+		if (String.valueOf(address.getPinCode()).length() == 6) {
+			throw new TrackerException("Enter a valid 6-digit Pin Code");
+		}
+
+		Address existingAddress = optional.get();
+
+		existingAddress.setDoorNo(address.getDoorNo());
+		existingAddress.setCity(address.getCity());
+		existingAddress.setPinCode(address.getPinCode());
+		existingAddress.setState(address.getState());
+		existingAddress.setStreetName(address.getStreetName());
+
+		addressRepository.save(existingAddress);
+		return "Address Updated Successfully";
+
+	}
+
+	@Override
+	public String deleteAddressByAddressId(int addressId) throws TrackerException {
+		Optional<Address> optional = addressRepository.findById(addressId);
+		if (!optional.isPresent()) {
+			throw new TrackerException("Address Not found (or) Invalid AddressId");
+		}
+		addressRepository.delete(optional.get());
+		return "Deleted Successfully";
 
 	}
 

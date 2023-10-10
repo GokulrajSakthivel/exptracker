@@ -34,7 +34,8 @@ public class Transaction {
 	private LocalDate transactionDate;
 
 	@Enumerated(EnumType.STRING)
-	private ExpendetureType ExpendetureType;
+	@Column(length = 30)
+	private ExpendetureType expendetureType;
 
 	private float credit;
 
@@ -42,8 +43,10 @@ public class Transaction {
 
 	private float closingBalance;
 
+	@Column(length = 30)
 	private String location;
 
+	@Column(length = 50)
 	private String otherDetails;
 
 	@ManyToOne(fetch = FetchType.LAZY)

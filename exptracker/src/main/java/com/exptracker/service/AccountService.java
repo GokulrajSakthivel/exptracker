@@ -1,15 +1,15 @@
 package com.exptracker.service;
 
 import com.exptracker.entity.Account;
-import com.exptracker.exception.CustomerException;
+import com.exptracker.exception.TrackerException;
 
 public interface AccountService {
 
-	public Account createAccount(Account account) throws CustomerException;
+	public Account createAccount(Account account) throws TrackerException;
 
-	public Account readAccountByAccNumber(long accNumber) throws CustomerException;
+	public Account readAccountByAccNumber(long accNumber) throws TrackerException;
 
-	public String updateAccount(Account account) throws CustomerException;
+	public String updateAccount(Account account, long accountNumber) throws TrackerException;
 
-	public String deleteAccountByAccNumber(long accNumber) throws CustomerException;
+	public String deleteAccountByAccNumber(long accNumber) throws TrackerException;
 }

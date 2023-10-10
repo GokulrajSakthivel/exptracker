@@ -1,18 +1,15 @@
 package com.exptracker.serviceimpl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.exptracker.entity.Account;
-import com.exptracker.entity.Customer;
 import com.exptracker.entity.Transaction;
 import com.exptracker.enums.ExpendetureType;
-import com.exptracker.exception.CustomerException;
+import com.exptracker.exception.TrackerException;
 import com.exptracker.repository.AccountRepository;
-import com.exptracker.repository.CustomerRepository;
 import com.exptracker.repository.TransactionRepository;
 import com.exptracker.service.TransactionService;
 
@@ -25,19 +22,20 @@ public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	private AccountRepository accountRepository;
 
-	@Autowired
-	private CustomerRepository customerRepository;
-
 	@Override
-	public Transaction createTransaction(Transaction transaction) throws CustomerException {
+	public Transaction createTransaction(Transaction transaction) throws TrackerException {
 
 		Optional<Account> optionals = accountRepository.findById(transaction.getAccountRef().getAccountNumber());
 
 		if (optionals.isPresent()) {
 			Account account = optionals.get();
 
-			if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() == 0.0) {
-				throw new CustomerException("Something went wrong or invalid Transaction");
+			if (!transaction.getTransactionDate().equals(LocalDate.now())) {
+				throw new TrackerException("Invalid Transaction Date");
+			}
+
+			if (transaction.getCredit() <= 0.0 && transaction.getWithdrawal() <= 0.0) {
+				throw new TrackerException("Something went wrong or invalid Transaction");
 			}
 
 			if (transaction.getCredit() != 0.0 && transaction.getWithdrawal() == 0.0) {
@@ -47,40 +45,34 @@ public class TransactionServiceImpl implements TransactionService {
 				transaction.setTransactionDate(LocalDate.now());
 			}
 
-			if (account.getAccountBalance() >= transaction.getWithdrawal()) {
-				if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() != 0.0) {
+			if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() != 0.0) {
+				if (account.getAccountBalance() >= transaction.getWithdrawal()) {
 					account.setAccountBalance(account.getAccountBalance() - transaction.getWithdrawal());
 					accountRepository.save(account);
 					transaction.setClosingBalance(account.getAccountBalance());
 					transaction.setTransactionDate(LocalDate.now());
+				} else {
+					throw new TrackerException("Insufficient Account Balance ");
 				}
-			} else {
-				throw new CustomerException("Insufficient Account Balance ");
 			}
-
-			Transaction transaction2 = transactionRepository.save(transaction);
-			return transaction2;
+			return transactionRepository.save(transaction);
 
 		} else {
-			throw new CustomerException("Invalid Account Number");
+			throw new TrackerException("Invalid Account Number : " + transaction.getAccountRef().getAccountNumber());
 		}
-
 	}
 
 	@Override
-	public Transaction readTransactionByTransactionId(int transactionId) throws CustomerException {
-		Transaction transaction2 = null;
+	public Transaction readTransactionByTransactionId(int transactionId) throws TrackerException {
 		Optional<Transaction> optional = transactionRepository.findById(transactionId);
-		if (optional.isPresent()) {
-			transaction2 = optional.get();
-		} else {
-			throw new CustomerException("Transaction not found for ID : " + transactionId);
+		if (!optional.isPresent()) {
+			throw new TrackerException("Transaction not found for ID : " + transactionId);
 		}
-		return transaction2;
+		return optional.get();
 	}
 
 	@Override
-	public String updateTransaction(Transaction transaction) throws CustomerException {
+	public String updateTransaction(Transaction transaction) throws TrackerException {
 		Optional<Transaction> optional = transactionRepository.findById(transaction.getTransactionId());
 		String message = "";
 		Transaction transaction2 = new Transaction();
@@ -95,27 +87,24 @@ public class TransactionServiceImpl implements TransactionService {
 			message = "Transaction Created Successfully ";
 
 		} else {
-			throw new CustomerException("Transaction not found for ID: " + transaction.getTransactionId());
+			throw new TrackerException("Transaction not found for ID: " + transaction.getTransactionId());
 		}
 		return message;
 
 	}
 
 	@Override
-	public String deleteTransactionByTransactionId(int transactionId) throws CustomerException {
-		Transaction transaction2 = readTransactionByTransactionId(transactionId);
-		String message = "";
-		if (transaction2 != null) {
-			transactionRepository.delete(transaction2);
-			message = "Transaction Deleted Successfully";
-		} else {
-			throw new CustomerException("Transaction not found for ID: " + transactionId);
+	public String deleteTransactionByTransactionId(int transactionId) throws TrackerException {
+		Optional<Transaction> optional = transactionRepository.findById(transactionId);
+		if (!optional.isPresent()) {
+			throw new TrackerException("Transaction not found for ID: " + transactionId);
 		}
-		return message;
+		transactionRepository.delete(optional.get());
+		return "Transaction Deleted Successfully";
 	}
 
 	@Override
-	public float totalTransactionByBank(long accNumber) throws CustomerException {
+	public float totalTransactionByBank(long accNumber) throws TrackerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
 		float total = 0;
 		if (accountOptional.isPresent()) {
@@ -125,30 +114,30 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 			return total;
 		} else {
-			throw new CustomerException("Account Not found for given Account Number : " + accNumber);
+			throw new TrackerException("Account Not found for given Account Number : " + accNumber);
 		}
 	}
 
 	@Override
-	public float totalTransactionByExpenditureType(long accNumber, ExpendetureType expendityreType)
-			throws CustomerException {
+	public float totalTransactionByExpenditureType(long accNumber, ExpendetureType expendetureType)
+			throws TrackerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
 		float total = 0;
 		if (accountOptional.isPresent()) {
 			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
 			for (Transaction transaction : listOftransactions) {
-				if (transaction.getExpendetureType().equals(expendityreType)) {
+				if (transaction.getExpendetureType().equals(expendetureType)) {
 					total = total + transaction.getWithdrawal();
 				}
 			}
 			return total;
 		} else {
-			throw new CustomerException("Account Not found for given Account Number : " + accNumber);
+			throw new TrackerException("Account Not found for given Account Number : " + accNumber);
 		}
 	}
 
 	@Override
-	public List<Transaction> overallTransactionByBank(long accNumber) throws CustomerException {
+	public List<Transaction> overallTransactionByBank(long accNumber) throws TrackerException {
 		Optional<Account> optional = accountRepository.findById(accNumber);
 		List<Transaction> list = null;
 		if (optional.isPresent()) {
@@ -156,10 +145,10 @@ public class TransactionServiceImpl implements TransactionService {
 			if (list != null) {
 				return list;
 			} else {
-				throw new CustomerException("No Transaction found for given Account Number  " + accNumber);
+				throw new TrackerException("No Transaction found for given Account Number  " + accNumber);
 			}
 		} else {
-			throw new CustomerException("Account Not found for given Account Number : " + accNumber);
+			throw new TrackerException("Account Not found for given Account Number : " + accNumber);
 		}
 
 //		List<Long> accountNumbers = new ArrayList<Long>();

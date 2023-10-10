@@ -31,18 +31,18 @@ public class AddressController {
 	}
 
 	@GetMapping(value = "readAddressByDoorNum/{doorNo}")
-	public ResponseEntity<Address> readAddressById(@PathVariable int doorNo) {
-		return new ResponseEntity<>(addressService.readAddressById(doorNo), HttpStatus.OK);
+	public ResponseEntity<Address> readAddressByDoorNo(@PathVariable int doorNo) {
+		return new ResponseEntity<>(addressService.readAddressByDoorNo(doorNo), HttpStatus.OK);
 	}
 
-	@PutMapping(value = "updateAddress")
-	public ResponseEntity<String> updateAddress(@RequestBody Address address) {
-		return new ResponseEntity<>(addressService.updateAddress(address), HttpStatus.ACCEPTED);
+	@PutMapping(value = "updateAddress/{addressId}")
+	public ResponseEntity<String> updateAddress(@RequestBody Address address , @PathVariable int addressId) {
+		return new ResponseEntity<>(addressService.updateAddress(address , addressId), HttpStatus.ACCEPTED);
 	}
 
 	@DeleteMapping(value = "deleteAddress/{addressId}")
 	public ResponseEntity<String> deleteAddress(@PathVariable int addressId) {
-		return new ResponseEntity<>(addressService.deleteAddressByDoorNumber(addressId), HttpStatus.ACCEPTED);
+		return new ResponseEntity<>(addressService.deleteAddressByAddressId(addressId), HttpStatus.ACCEPTED);
 
 	}
 }

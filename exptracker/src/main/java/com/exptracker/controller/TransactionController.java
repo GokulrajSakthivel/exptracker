@@ -3,6 +3,8 @@ package com.exptracker.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,35 +23,35 @@ public class TransactionController {
 	private TransactionService transactionService;
 
 	@PostMapping(value = "createTransaction")
-	public Transaction createTransaction(@RequestBody Transaction transaction) {
-		Transaction transaction2 = transactionService.createTransaction(transaction);
-		return transaction2;
+	public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+		return new ResponseEntity<>(transactionService.createTransaction(transaction),HttpStatus.CREATED);
+		
 	}
 
 	@GetMapping(value = "readTransaction/{transactionId}")
-	public Transaction readTransactionById(@PathVariable int transactionId) {
-		return transactionService.readTransactionByTransactionId(transactionId);
+	public ResponseEntity<Transaction> readTransactionById(@PathVariable int transactionId) {
+		return new ResponseEntity<>(transactionService.readTransactionByTransactionId(transactionId),HttpStatus.OK);
 
 	}
 
 	@DeleteMapping(value = "deleteTransaction/{transactionId}")
-	public String deleteTransaction(@PathVariable int transactionId) {
-		return transactionService.deleteTransactionByTransactionId(transactionId);
+	public ResponseEntity<String> deleteTransaction(@PathVariable int transactionId) {
+		return new ResponseEntity<>(transactionService.deleteTransactionByTransactionId(transactionId),HttpStatus.ACCEPTED);
 	}
 
 	@GetMapping(value = "totalTransaction/{accNumber}")
-	public float getAllTransactionByAccNumber(@PathVariable long accNumber) {
-		return transactionService.totalTransactionByBank(accNumber);
+	public ResponseEntity<Float> getAllTransactionByAccNumber(@PathVariable long accNumber) {
+		return new ResponseEntity<>(transactionService.totalTransactionByBank(accNumber),HttpStatus.OK);
 	}
 
 	@GetMapping(value = "totalTransaction/{accNumber}/{expenditureType}")
-	public float getAllTransactionByAccNumber(@PathVariable int accNumber, @PathVariable ExpendetureType expenditureType) {
-		return transactionService.totalTransactionByExpenditureType(accNumber, expenditureType);
+	public ResponseEntity<Float> getAllTransactionByAccNumber(@PathVariable int accNumber, @PathVariable ExpendetureType expenditureType) {
+		return new ResponseEntity<>(transactionService.totalTransactionByExpenditureType(accNumber, expenditureType),HttpStatus.OK);
 	}
 	
 	@GetMapping("overAllTransaction/{accNumber}")
-	public List<Transaction> overAllTransactionsByAccountNumber(@PathVariable long accNumber){
-		return transactionService.overallTransactionByBank(accNumber);
+	public ResponseEntity<List<Transaction>> overAllTransactionsByAccountNumber(@PathVariable long accNumber){
+		return new ResponseEntity<>(transactionService.overallTransactionByBank(accNumber),HttpStatus.OK);
 	}
 
 }

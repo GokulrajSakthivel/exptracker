@@ -1,6 +1,8 @@
 package com.exptracker.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,23 +20,23 @@ public class AccountController {
 	private AccountService accountService;
 
 	@PostMapping(value = "createAccount")
-	public Account createAccount(@RequestBody Account account) {
-		return accountService.createAccount(account);
+	public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+		return new ResponseEntity<>(accountService.createAccount(account),HttpStatus.CREATED);
 	}
 
 	@GetMapping(value = "readAccount/{accNum}")
-	public Account readAccountByAccNumber(@PathVariable long accNum) {
-		return accountService.readAccountByAccNumber(accNum);
+	public ResponseEntity<Account> readAccountByAccNumber(@PathVariable long accNum) {
+		return new ResponseEntity<>(accountService.readAccountByAccNumber(accNum),HttpStatus.OK);
 	}
 
-	@PutMapping(value = "updateAccount")
-	public String updateAccountByAccountNumber(@RequestBody Account account) {
-		return accountService.updateAccount(account);
+	@PutMapping(value = "updateAccount/{accountNumber}")
+	public ResponseEntity<String> updateAccountByAccountNumber(@RequestBody Account account ,@PathVariable long accountNumber) {
+		return new ResponseEntity<>(accountService.updateAccount(account , accountNumber),HttpStatus.ACCEPTED);
 	}
 
 	@DeleteMapping(value = "deleteAccount/{accNumber}")
-	public String deleteaccount(long accNumber) {
-		return accountService.deleteAccountByAccNumber(accNumber);
+	public ResponseEntity<String> deleteaccount(long accNumber) {
+		return new ResponseEntity<>(accountService.deleteAccountByAccNumber(accNumber),HttpStatus.ACCEPTED);
 	}
 
 }

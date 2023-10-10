@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalException {
 	
-	@ExceptionHandler(value = CustomerException.class)
+	@ExceptionHandler(value = TrackerException.class)
 	public ResponseEntity<String> globalEntity(Exception exception) {
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
 	}
-
 }

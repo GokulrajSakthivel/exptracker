@@ -38,6 +38,7 @@ public class Account {
 	private String bankName;
 
 	@Enumerated(EnumType.STRING)
+	@Column(length = 30)
 	private AccountType accountType;
 	
 	private float accountBalance; 

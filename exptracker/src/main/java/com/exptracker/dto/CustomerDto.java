@@ -1,9 +1,7 @@
 package com.exptracker.dto;
-import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.exptracker.entity.Account;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
