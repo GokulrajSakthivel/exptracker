@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.exptracker.dto.AddressDto;
 import com.exptracker.entity.Address;
 import com.exptracker.service.AddressService;
 
@@ -21,19 +23,24 @@ public class AddressController {
 	private AddressService addressService;
 
 	@PostMapping(value = "createAddress")
-	public ResponseEntity<Address> createAddress(@RequestBody Address address) {
+	public ResponseEntity<String> createAddress(@RequestBody Address address) {
 		return new ResponseEntity<>(addressService.createAddress(address), HttpStatus.CREATED);
 	}
 
-	@GetMapping(value = "readAddress/{pincode}")
-	public ResponseEntity<List<Address>> readAddress(@PathVariable int pincode) {
-		return new ResponseEntity<>(addressService.readAddressByPincode(pincode), HttpStatus.OK);
+	@GetMapping(value = "readAddress/{addressId}")
+	public ResponseEntity<AddressDto> readAddress(@PathVariable int addressId) {
+		return new ResponseEntity<>(addressService.readAddressByAddressId(addressId), HttpStatus.OK);
 	}
-
-	@GetMapping(value = "readAddressByDoorNum/{doorNo}")
-	public ResponseEntity<Address> readAddressByDoorNo(@PathVariable int doorNo) {
-		return new ResponseEntity<>(addressService.readAddressByDoorNo(doorNo), HttpStatus.OK);
-	}
+	
+//	@GetMapping(value = "readAddress/{pincode}")
+//	public ResponseEntity<List<Address>> readAddress(@PathVariable int pincode) {
+//		return new ResponseEntity<>(addressService.readAddressByPincode(pincode), HttpStatus.OK);
+//	}
+//
+//	@GetMapping(value = "readAddressByDoorNum/{doorNo}")
+//	public ResponseEntity<List<Address>> readAddressByDoorNo(@PathVariable int doorNo) {
+//		return new ResponseEntity<>(addressService.readAddressByDoorNo(doorNo), HttpStatus.OK);
+//	}
 
 	@PutMapping(value = "updateAddress/{addressId}")
 	public ResponseEntity<String> updateAddress(@RequestBody Address address , @PathVariable int addressId) {

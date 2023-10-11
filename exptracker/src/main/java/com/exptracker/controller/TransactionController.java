@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exptracker.dto.TransactionDto;
 import com.exptracker.entity.Transaction;
 import com.exptracker.enums.ExpendetureType;
 import com.exptracker.service.TransactionService;
@@ -23,13 +24,13 @@ public class TransactionController {
 	private TransactionService transactionService;
 
 	@PostMapping(value = "createTransaction")
-	public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+	public ResponseEntity<String> createTransaction(@RequestBody Transaction transaction) {
 		return new ResponseEntity<>(transactionService.createTransaction(transaction),HttpStatus.CREATED);
 		
 	}
 
 	@GetMapping(value = "readTransaction/{transactionId}")
-	public ResponseEntity<Transaction> readTransactionById(@PathVariable int transactionId) {
+	public ResponseEntity<TransactionDto> readTransactionById(@PathVariable int transactionId) {
 		return new ResponseEntity<>(transactionService.readTransactionByTransactionId(transactionId),HttpStatus.OK);
 
 	}
@@ -39,7 +40,7 @@ public class TransactionController {
 		return new ResponseEntity<>(transactionService.deleteTransactionByTransactionId(transactionId),HttpStatus.ACCEPTED);
 	}
 
-	@GetMapping(value = "totalTransaction/{accNumber}")
+	@GetMapping(value = "totalWithdrawl/{accNumber}")
 	public ResponseEntity<Float> getAllTransactionByAccNumber(@PathVariable long accNumber) {
 		return new ResponseEntity<>(transactionService.totalTransactionByBank(accNumber),HttpStatus.OK);
 	}

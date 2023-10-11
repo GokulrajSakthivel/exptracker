@@ -1,25 +1,21 @@
 package com.exptracker.dto;
-
-import java.time.LocalDate;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+
 import org.springframework.stereotype.Component;
-import com.exptracker.enums.ExpendetureType;
+import com.exptracker.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class TransactionDto {
+public class AccountDto {
 
-	private LocalDate transactionDate;
-	private float credit;
-	private float withdrawal;
-	private float closingBalance;
-	private String location;
+	private long accountNumber;
+	private String bankName;
+	private AccountType accountType;
+	private float accountBalance;
 
 }

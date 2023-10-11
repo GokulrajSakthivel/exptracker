@@ -22,12 +22,12 @@ public class CustomerController {
 	private CustomerService customerService;
 
 	@PostMapping(value = "createCustomer")
-	public ResponseEntity<Customer> createTransaction(@RequestBody Customer customer) {
+	public ResponseEntity<String> createCustomer(@RequestBody Customer customer) {
 		return new ResponseEntity<>(customerService.createCustomer(customer),HttpStatus.CREATED);
 	}
 
 	@GetMapping(value = "readCustomer/{id}")
-	public ResponseEntity<Customer> readCustomerById(@PathVariable int id) {
+	public ResponseEntity<CustomerDto> readCustomerById(@PathVariable int id) {
 		return new ResponseEntity<>(customerService.readCustomerById(id),HttpStatus.OK);
 		
 	}

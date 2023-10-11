@@ -3,8 +3,12 @@ package com.exptracker.serviceimpl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.exptracker.dto.TransactionDto;
 import com.exptracker.entity.Account;
 import com.exptracker.entity.Transaction;
 import com.exptracker.enums.ExpendetureType;
@@ -22,8 +26,11 @@ public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	private AccountRepository accountRepository;
 
+	@Autowired
+	private ModelMapper mapper;
+
 	@Override
-	public Transaction createTransaction(Transaction transaction) throws TrackerException {
+	public String createTransaction(Transaction transaction) throws TrackerException {
 
 		Optional<Account> optionals = accountRepository.findById(transaction.getAccountRef().getAccountNumber());
 
@@ -33,11 +40,19 @@ public class TransactionServiceImpl implements TransactionService {
 			if (!transaction.getTransactionDate().equals(LocalDate.now())) {
 				throw new TrackerException("Invalid Transaction Date");
 			}
-
-			if (transaction.getCredit() <= 0.0 && transaction.getWithdrawal() <= 0.0) {
-				throw new TrackerException("Something went wrong or invalid Transaction");
+			if (transaction.getCredit() < 0.0 || transaction.getWithdrawal() < 0.0) {
+				throw new TrackerException("  invalid Transaction 1");
 			}
-
+			
+			if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() == 0.0) {
+				throw new TrackerException("Something went wrong or invalid Transaction 2");
+			}
+			
+			if (transaction.getCredit() > 0.0 && transaction.getWithdrawal() > 0.0) {
+				throw new TrackerException("Something went wrong or invalid Transaction 3");
+			}
+			
+		
 			if (transaction.getCredit() != 0.0 && transaction.getWithdrawal() == 0.0) {
 				account.setAccountBalance(account.getAccountBalance() + transaction.getCredit());
 				accountRepository.save(account);
@@ -55,7 +70,9 @@ public class TransactionServiceImpl implements TransactionService {
 					throw new TrackerException("Insufficient Account Balance ");
 				}
 			}
-			return transactionRepository.save(transaction);
+			transactionRepository.save(transaction);
+			
+			return "Transaction Created Successfully";
 
 		} else {
 			throw new TrackerException("Invalid Account Number : " + transaction.getAccountRef().getAccountNumber());
@@ -63,12 +80,12 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Transaction readTransactionByTransactionId(int transactionId) throws TrackerException {
+	public TransactionDto readTransactionByTransactionId(int transactionId) throws TrackerException {
 		Optional<Transaction> optional = transactionRepository.findById(transactionId);
 		if (!optional.isPresent()) {
 			throw new TrackerException("Transaction not found for ID : " + transactionId);
 		}
-		return optional.get();
+		return mapper.map(optional.get(), TransactionDto.class);
 	}
 
 	@Override

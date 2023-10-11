@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exptracker.dto.AccountDto;
 import com.exptracker.entity.Account;
 import com.exptracker.service.AccountService;
 
@@ -20,12 +21,12 @@ public class AccountController {
 	private AccountService accountService;
 
 	@PostMapping(value = "createAccount")
-	public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+	public ResponseEntity<String> createAccount(@RequestBody Account account) {
 		return new ResponseEntity<>(accountService.createAccount(account),HttpStatus.CREATED);
 	}
 
 	@GetMapping(value = "readAccount/{accNum}")
-	public ResponseEntity<Account> readAccountByAccNumber(@PathVariable long accNum) {
+	public ResponseEntity<AccountDto> readAccountByAccNumber(@PathVariable long accNum) {
 		return new ResponseEntity<>(accountService.readAccountByAccNumber(accNum),HttpStatus.OK);
 	}
 

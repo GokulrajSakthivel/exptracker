@@ -2,9 +2,11 @@ package com.exptracker.serviceimpl;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.exptracker.dto.AccountDto;
 import com.exptracker.entity.Account;
 import com.exptracker.entity.Customer;
 import com.exptracker.exception.TrackerException;
@@ -20,30 +22,37 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private CustomerRepository customerRepository;
+	
+	@Autowired
+	private ModelMapper mapper;
 
 	@Override
-	public Account createAccount(Account account) throws TrackerException {
+	public String createAccount(Account account) throws TrackerException {
 
 		Optional<Customer> optional = customerRepository.findById(account.getCustomerRef().getCustomerId());
 		if (!optional.isPresent()) {
 			throw new TrackerException(" Invalid Customer ID ");
 		}
 
-		if (account.getBankName().length() <= 3) {
+		if (account.getBankName().length() < 3) {
 			throw new TrackerException("Invalid Bank Name");
 		}
-
 		
-		return  accountRepository.save(account);
+		if (account.getAccountBalance() < 0) {
+			throw new TrackerException("Invalid Account Balance : " + account.getAccountBalance());
+		}
+
+		accountRepository.save(account);
+		return "Account Created Successfully";
 	}
 
 	@Override
-	public Account readAccountByAccNumber(long accNumber) throws TrackerException {
+	public AccountDto readAccountByAccNumber(long accNumber) throws TrackerException {
 		Optional<Account> optional = accountRepository.findById(accNumber);
 		if (!optional.isPresent()) {
 			throw new TrackerException("Account Not found  :" + accNumber);	
 		}
-		return optional.get();
+		return mapper.map(optional.get(), AccountDto.class);
 	}
 
 	@Override
@@ -57,6 +66,12 @@ public class AccountServiceImpl implements AccountService {
 		Optional<Account> optional = accountRepository.findById(accountNumber);
 		if (!optional.isPresent()) {
 			throw new TrackerException(" Account Number Not Found :" + accountNumber);
+		}
+		if (account.getBankName().length() < 3) {
+			throw new TrackerException("Invalid Bank Name");
+		}
+		if (account.getAccountBalance() < 0) {
+			throw new TrackerException("Invalid Account Balance : " + account.getAccountBalance());
 		}
 
 		Account existingAccount = optional.get();

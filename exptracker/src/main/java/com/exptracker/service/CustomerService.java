@@ -6,9 +6,9 @@ import com.exptracker.exception.TrackerException;
 
 public interface CustomerService {
 
-	public Customer createCustomer(Customer customer) throws TrackerException;
+	public String createCustomer(Customer customer) throws TrackerException;
 
-	public Customer readCustomerById(int custId) throws TrackerException;
+	public CustomerDto readCustomerById(int custId) throws TrackerException;
 
 	public String updateCustomer(Customer customer , int customerId ) throws TrackerException;
 

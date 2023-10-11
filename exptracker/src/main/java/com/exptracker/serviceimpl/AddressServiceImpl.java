@@ -2,8 +2,12 @@ package com.exptracker.serviceimpl;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.exptracker.dto.AddressDto;
 import com.exptracker.entity.Address;
 import com.exptracker.entity.Customer;
 import com.exptracker.exception.TrackerException;
@@ -20,39 +24,53 @@ public class AddressServiceImpl implements AddressService {
 	@Autowired
 	private CustomerRepository customerRepository;
 
+	@Autowired
+	private ModelMapper mapper;
+
 	@Override
-	public Address createAddress(Address address) throws TrackerException {
+	public String createAddress(Address address) throws TrackerException {
 
 		Optional<Customer> optional = customerRepository.findById(address.getCustomer().getCustomerId());
 		if (!optional.isPresent()) {
 			throw new TrackerException(" Invalid Customer ID ");
 		}
 
-		if (String.valueOf(address.getPinCode()).length() == 6) {
+		if (String.valueOf(address.getPinCode()).length() != 6) {
 			throw new TrackerException("Enter a valid 6-digit Pin Code");
 		}
 
-		return addressRepository.save(address);
+		addressRepository.save(address);
+		return "Address Created Successfully";
 	}
 
 	@Override
-	public List<Address> readAddressByPincode(int pincode) throws TrackerException {
-		List<Address> address = addressRepository.findAllByPinCode(pincode);
-		if (!address.isEmpty()) {
-			return address;
-		} else {
-			throw new TrackerException("Address Not found for Pincode : " + pincode);
-		}
-	}
-
-	@Override
-	public Address readAddressByDoorNo(int doorNo) throws TrackerException {
-		Optional<Address> optional = addressRepository.findById(doorNo);
+	public AddressDto readAddressByAddressId(int addressId) throws TrackerException {
+		Optional<Address> optional = addressRepository.findById(addressId);
 		if (!optional.isPresent()) {
-			throw new TrackerException("Address Not found for doorNumber : " + doorNo);
+			throw new TrackerException(" Address ID Not found ");
+
 		}
-		return optional.get();
+		return mapper.map(optional.get(), AddressDto.class);
+
 	}
+
+//	@Override
+//	public List<Address> readAddressByPincode(int pincode) throws TrackerException {
+//		List<Address> address = addressRepository.findAllByPinCode(pincode);
+//		if (address.isEmpty()) {
+//			throw new TrackerException("Address Not found for Pincode : " + pincode);
+//		}
+//		return address;
+//	}
+//
+//	@Override
+//	public List<Address> readAddressByDoorNo(int doorNo) throws TrackerException {
+//		List<Address> address= addressRepository.findAllByDoorNo(doorNo);
+//		if (address.isEmpty()) {
+//			throw new TrackerException("Address Not found for doorNumber : " + doorNo);
+//		}
+//		return address;
+//	}
 
 	@Override
 	public String updateAddress(Address address, int addressId) throws TrackerException {
@@ -67,7 +85,7 @@ public class AddressServiceImpl implements AddressService {
 			throw new TrackerException(" Address ID Not found ");
 		}
 
-		if (String.valueOf(address.getPinCode()).length() == 6) {
+		if (String.valueOf(address.getPinCode()).length() != 6) {
 			throw new TrackerException("Enter a valid 6-digit Pin Code");
 		}
 

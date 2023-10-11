@@ -1,15 +1,16 @@
 package com.exptracker.service;
 import java.util.List;
 
+import com.exptracker.dto.TransactionDto;
 import com.exptracker.entity.Transaction;
 import com.exptracker.enums.ExpendetureType;
 import com.exptracker.exception.TrackerException;
 
 public interface TransactionService {
 	
-	public Transaction createTransaction(Transaction transaction ) throws TrackerException;
+	public String createTransaction(Transaction transaction ) throws TrackerException;
 
-	public Transaction readTransactionByTransactionId(int transactionId) throws TrackerException;
+	public TransactionDto readTransactionByTransactionId(int transactionId) throws TrackerException;
 
 	public String updateTransaction(Transaction transaction) throws TrackerException;
 
