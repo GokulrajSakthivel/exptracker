@@ -45,7 +45,7 @@ public class TransactionController {
 		return new ResponseEntity<>(transactionService.totalTransactionByBank(accNumber),HttpStatus.OK);
 	}
 
-	@GetMapping(value = "totalTransaction/{accNumber}/{expenditureType}")
+	@GetMapping(value = "totalWithdrawl/{accNumber}/{expenditureType}")
 	public ResponseEntity<Float> getAllTransactionByAccNumber(@PathVariable int accNumber, @PathVariable ExpendetureType expenditureType) {
 		return new ResponseEntity<>(transactionService.totalTransactionByExpenditureType(accNumber, expenditureType),HttpStatus.OK);
 	}
