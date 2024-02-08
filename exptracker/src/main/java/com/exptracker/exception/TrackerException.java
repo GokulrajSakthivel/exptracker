@@ -12,7 +12,6 @@ public class TrackerException extends RuntimeException {
 
 	@Override
 	public String getMessage() {
-
 		return this.errorMessage;
 	}
 

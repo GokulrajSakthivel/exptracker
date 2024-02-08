@@ -1,5 +1,7 @@
+
 package com.exptracker.serviceimpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -27,9 +29,9 @@ public class AccountServiceImpl implements AccountService {
 	private ModelMapper mapper;
 
 	@Override
-	public String createAccount(Account account) throws TrackerException {
+	public String createAccount(Account account , int customerId) throws TrackerException {
 
-		Optional<Customer> optional = customerRepository.findById(account.getCustomerRef().getCustomerId());
+		Optional<Customer> optional = customerRepository.findById(customerId);
 		if (!optional.isPresent()) {
 			throw new TrackerException(" Invalid Customer ID ");
 		}
@@ -42,6 +44,7 @@ public class AccountServiceImpl implements AccountService {
 			throw new TrackerException("Invalid Account Balance : " + account.getAccountBalance());
 		}
 
+		account.setCustomerRef(optional.get());
 		accountRepository.save(account);
 		return "Account Created Successfully";
 	}
@@ -92,5 +95,12 @@ public class AccountServiceImpl implements AccountService {
 		}
 		accountRepository.delete(optional.get());
 		return " Deleted Successfully";
+	}
+
+	@Override
+	public List<Account> readAccountByCustomer(int customerId) throws TrackerException {
+      List<Account>	listOfAccounts = customerRepository.findById(customerId).get().getAccounts();
+      
+		return listOfAccounts;
 	}
 }

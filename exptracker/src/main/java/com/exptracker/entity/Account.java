@@ -52,4 +52,6 @@ public class Account {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "accountRef")
 	private List<Transaction> transactions;
 
+		
+
 }

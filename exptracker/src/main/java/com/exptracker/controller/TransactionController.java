@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,14 +19,15 @@ import com.exptracker.enums.ExpendetureType;
 import com.exptracker.service.TransactionService;
 
 @RestController
+@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class TransactionController {
 
 	@Autowired
 	private TransactionService transactionService;
 
-	@PostMapping(value = "createTransaction")
-	public ResponseEntity<String> createTransaction(@RequestBody Transaction transaction) {
-		return new ResponseEntity<>(transactionService.createTransaction(transaction),HttpStatus.CREATED);
+	@PostMapping(value = "createTransaction/{accountNumber}")
+	public ResponseEntity<String> createTransaction(@RequestBody Transaction transaction , @PathVariable long accountNumber) {
+		return new ResponseEntity<>(transactionService.createTransaction(transaction, accountNumber) ,HttpStatus.CREATED);
 		
 	}
 
@@ -41,8 +43,13 @@ public class TransactionController {
 	}
 
 	@GetMapping(value = "totalWithdrawl/{accNumber}")
-	public ResponseEntity<Float> getAllTransactionByAccNumber(@PathVariable long accNumber) {
-		return new ResponseEntity<>(transactionService.totalTransactionByBank(accNumber),HttpStatus.OK);
+	public ResponseEntity<Float> getTotalWithdrawlByAccNumber(@PathVariable long accNumber) {
+		return new ResponseEntity<>(transactionService.totalWithdrawlByBank(accNumber),HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "totalCredit/{accNumber}")
+	public ResponseEntity<Float> getTotalCreditByAccNumber(@PathVariable long accNumber) {
+		return new ResponseEntity<>(transactionService.totalCreditByBank(accNumber),HttpStatus.OK);
 	}
 
 	@GetMapping(value = "totalWithdrawl/{accNumber}/{expenditureType}")

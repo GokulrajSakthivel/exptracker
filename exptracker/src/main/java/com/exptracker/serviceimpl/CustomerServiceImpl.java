@@ -73,14 +73,20 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new TrackerException("Enter a valid contact number");
 		}
 
-
+		Customer isDuplicateContact = customerRepository.findByContactNumber(customer.getContactNumber());
+		
+		if(isDuplicateContact!= null) {
+			if (isDuplicateContact.getCustomerId() != customer.getCustomerId() ) {
+				throw new TrackerException("ContactNumber already exist Try different ");
+			}
+		}
+			
+		
 		Optional<Customer> data = customerRepository.findById(customerId);
 		if (!data.isPresent()) {
 			throw new TrackerException("Customer not found for ID : " + customerId);
 		}
 		
-		
-
 		Customer existingCustomer = data.get();
 
 		existingCustomer.setCustomerName(customer.getCustomerName());

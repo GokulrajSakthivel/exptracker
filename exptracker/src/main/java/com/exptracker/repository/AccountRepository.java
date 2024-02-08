@@ -5,4 +5,7 @@ import com.exptracker.entity.Account;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
+	
+	
+	
 }

@@ -1,6 +1,4 @@
 package com.exptracker.dto;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 
 import org.springframework.stereotype.Component;
 import com.exptracker.enums.AccountType;

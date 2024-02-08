@@ -10,6 +10,6 @@ public class GlobalException {
 	
 	@ExceptionHandler(value = TrackerException.class)
 	public ResponseEntity<String> globalEntity(Exception exception) {
-		return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+		return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 }

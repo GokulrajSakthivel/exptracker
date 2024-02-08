@@ -8,7 +8,7 @@ import com.exptracker.exception.TrackerException;
 
 public interface TransactionService {
 	
-	public String createTransaction(Transaction transaction ) throws TrackerException;
+	public String createTransaction(Transaction transaction , long accountNumber ) throws TrackerException;
 
 	public TransactionDto readTransactionByTransactionId(int transactionId) throws TrackerException;
 
@@ -16,7 +16,9 @@ public interface TransactionService {
 
 	public String deleteTransactionByTransactionId(int transactionId) throws TrackerException;
 	
-	public float totalTransactionByBank(long accNumber) throws TrackerException;
+	public float totalWithdrawlByBank(long accNumber) throws TrackerException;
+	
+	public float totalCreditByBank(long accNumber)throws TrackerException;
 
 	public float totalTransactionByExpenditureType(long accNumber , ExpendetureType expendityreType) throws TrackerException;
 	

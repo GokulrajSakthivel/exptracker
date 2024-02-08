@@ -1,10 +1,7 @@
 package com.exptracker.dto;
 
 import java.time.LocalDate;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import org.springframework.stereotype.Component;
-import com.exptracker.enums.ExpendetureType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

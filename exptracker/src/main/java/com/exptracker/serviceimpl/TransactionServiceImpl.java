@@ -30,26 +30,31 @@ public class TransactionServiceImpl implements TransactionService {
 	private ModelMapper mapper;
 
 	@Override
-	public String createTransaction(Transaction transaction) throws TrackerException {
+	public String createTransaction(Transaction transaction , long accountNumber) throws TrackerException {
 
-		Optional<Account> optionals = accountRepository.findById(transaction.getAccountRef().getAccountNumber());
+		Optional<Account> optionals = accountRepository.findById(accountNumber);
 
 		if (optionals.isPresent()) {
 			Account account = optionals.get();
 
-			if (!transaction.getTransactionDate().equals(LocalDate.now())) {
-				throw new TrackerException("Invalid Transaction Date");
+//			if (!transaction.getTransactionDate().equals(LocalDate.now())) {
+//				throw new TrackerException("Invalid Transaction Date");
+//			}
+			
+			if (transaction.getTransactionDate().isAfter(LocalDate.now())) {
+			    throw new TrackerException("Invalid Transaction Date: Future date not allowed");
 			}
+			
 			if (transaction.getCredit() < 0.0 || transaction.getWithdrawal() < 0.0) {
-				throw new TrackerException("  invalid Transaction 1");
+				throw new TrackerException("  amount should not be negative ");
 			}
 			
 			if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() == 0.0) {
-				throw new TrackerException("Something went wrong or invalid Transaction 2");
+				throw new TrackerException(" amount should not 0.0");
 			}
 			
 			if (transaction.getCredit() > 0.0 && transaction.getWithdrawal() > 0.0) {
-				throw new TrackerException("Something went wrong or invalid Transaction 3");
+				throw new TrackerException(" use only credit (or) widthdrawl at a time ");
 			}
 			
 		
@@ -57,7 +62,7 @@ public class TransactionServiceImpl implements TransactionService {
 				account.setAccountBalance(account.getAccountBalance() + transaction.getCredit());
 				accountRepository.save(account);
 				transaction.setClosingBalance(account.getAccountBalance());
-				transaction.setTransactionDate(LocalDate.now());
+//				transaction.setTransactionDate(LocalDate.now());
 			}
 
 			if (transaction.getCredit() == 0.0 && transaction.getWithdrawal() != 0.0) {
@@ -65,17 +70,19 @@ public class TransactionServiceImpl implements TransactionService {
 					account.setAccountBalance(account.getAccountBalance() - transaction.getWithdrawal());
 					accountRepository.save(account);
 					transaction.setClosingBalance(account.getAccountBalance());
-					transaction.setTransactionDate(LocalDate.now());
+//					transaction.setTransactionDate(LocalDate.now());
 				} else {
 					throw new TrackerException("Insufficient Account Balance ");
 				}
 			}
+			
+			transaction.setAccountRef(optionals.get());
 			transactionRepository.save(transaction);
 			
 			return "Transaction Created Successfully";
 
 		} else {
-			throw new TrackerException("Invalid Account Number : " + transaction.getAccountRef().getAccountNumber());
+			throw new TrackerException("Invalid Account Number : " + accountNumber);
 		}
 	}
 
@@ -121,13 +128,29 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public float totalTransactionByBank(long accNumber) throws TrackerException {
+	public float totalWithdrawlByBank(long accNumber) throws TrackerException {
 		Optional<Account> accountOptional = accountRepository.findById(accNumber);
 		float total = 0;
 		if (accountOptional.isPresent()) {
 			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
 			for (Transaction transaction : listOftransactions) {
 				total = total + transaction.getWithdrawal();
+			}
+			return total;
+		} else {
+			throw new TrackerException("Account Not found for given Account Number : " + accNumber);
+		}
+	}
+	
+	
+	@Override
+	public float totalCreditByBank(long accNumber) throws TrackerException {
+		Optional<Account> accountOptional = accountRepository.findById(accNumber);
+		float total = 0;
+		if (accountOptional.isPresent()) {
+			List<Transaction> listOftransactions = accountOptional.get().getTransactions();
+			for (Transaction transaction : listOftransactions) {
+				total = total + transaction.getCredit();
 			}
 			return total;
 		} else {
@@ -173,5 +196,7 @@ public class TransactionServiceImpl implements TransactionService {
 //		accountRepository.findAllById(accountNumbers);
 //		return null;
 	}
+
+	
 
 }
