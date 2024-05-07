@@ -44,7 +44,7 @@ public class Customer {
 	private String contactNumber;
 
 	@JsonManagedReference(value = "customer_accounts")
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "customerRef")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "customerRef")  
 	private List<Account> accounts;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "customer")

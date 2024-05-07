@@ -11,11 +11,10 @@ public class ExptrackerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ExptrackerApplication.class, args);
 	}
-	
-	
 
 	@Bean
 	public ModelMapper mapper() {
 		return new ModelMapper();
 	}
+
 }

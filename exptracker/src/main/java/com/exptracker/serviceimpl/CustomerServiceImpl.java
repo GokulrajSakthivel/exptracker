@@ -39,19 +39,19 @@ public class CustomerServiceImpl implements CustomerService {
 //		if (isDuplicate) {
 //			throw new TrackerException("Username and password already exist Try different ");
 //		}
-		
+
 		boolean isDuplicate = customerRepository.existsByUserName(customer.getUserName());
 		if (isDuplicate) {
 			throw new TrackerException("Username already exist Try different ");
 		}
-		
+
 		boolean isDuplicateContact = customerRepository.existsByContactNumber(customer.getContactNumber());
 		if (isDuplicateContact) {
 			throw new TrackerException("ContactNumber already exist Try different ");
 		}
-		
+
 		customerRepository.save(customer);
-		
+
 		return "Customer Created Successfully";
 
 	}
@@ -59,6 +59,8 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public CustomerDto readCustomerById(int custId) throws TrackerException {
 		Optional<Customer> customer = customerRepository.findById(custId);
+		
+
 		if (!customer.isPresent()) {
 			throw new TrackerException("Customer not found for ID: " + custId);
 		}
@@ -67,26 +69,25 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public String updateCustomer(Customer customer, int customerId) throws TrackerException {
-		
+
 		boolean contactNumber = customer.getContactNumber().matches("^(\\+91)?[6789]\\d{9}$");
 		if (!contactNumber) {
 			throw new TrackerException("Enter a valid contact number");
 		}
 
 		Customer isDuplicateContact = customerRepository.findByContactNumber(customer.getContactNumber());
-		
-		if(isDuplicateContact!= null) {
-			if (isDuplicateContact.getCustomerId() != customer.getCustomerId() ) {
+
+		if (isDuplicateContact != null) {
+			if (isDuplicateContact.getCustomerId() != customer.getCustomerId()) {
 				throw new TrackerException("ContactNumber already exist Try different ");
 			}
 		}
-			
-		
+
 		Optional<Customer> data = customerRepository.findById(customerId);
 		if (!data.isPresent()) {
 			throw new TrackerException("Customer not found for ID : " + customerId);
 		}
-		
+
 		Customer existingCustomer = data.get();
 
 		existingCustomer.setCustomerName(customer.getCustomerName());
@@ -112,7 +113,6 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customers = customerRepository.findByUserNameAndPassword(userName, password);
 		CustomerDto dtoModel = null;
 		List<Customer> customer = customerRepository.findAll();
-
 		boolean isDuplicate = customer.stream().anyMatch(
 				customer1 -> customer1.getUserName().equals(userName) && customer1.getPassword().equals(password));
 

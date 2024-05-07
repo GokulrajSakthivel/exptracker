@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exptracker.dto.CustomerDto;
@@ -17,7 +19,7 @@ import com.exptracker.entity.Customer;
 import com.exptracker.service.CustomerService;
 
 @RestController
-@CrossOrigin(allowedHeaders = "*",origins = "*")
+//@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class CustomerController {
 
 	@Autowired
@@ -28,6 +30,7 @@ public class CustomerController {
 		return new ResponseEntity<>(customerService.createCustomer(customer),HttpStatus.OK);
 	}
 
+//	@RequestMapping(method = RequestMethod.GET,value = "readCustomer/{id}")
 	@GetMapping(value = "readCustomer/{id}")
 	public ResponseEntity<CustomerDto> readCustomerById(@PathVariable int id) {
 		return new ResponseEntity<>(customerService.readCustomerById(id),HttpStatus.OK);

@@ -17,7 +17,7 @@ import com.exptracker.entity.Account;
 import com.exptracker.service.AccountService;
 
 @RestController
-@CrossOrigin(allowedHeaders = "*",origins = "*")
+//@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class AccountController {
 	@Autowired
 	private AccountService accountService;
@@ -28,7 +28,7 @@ public class AccountController {
 	}
 
 	@GetMapping(value = "readAccount/{accNum}")
-	public ResponseEntity<AccountDto> readAccountByAccNumber(@PathVariable long accNum) {
+	public ResponseEntity<AccountDto> readAccountByAccNumber(@PathVariable long accNum) {		
 		return new ResponseEntity<>(accountService.readAccountByAccNumber(accNum),HttpStatus.OK);
 	}
 
