@@ -17,7 +17,7 @@ import com.exptracker.entity.Account;
 import com.exptracker.service.AccountService;
 
 @RestController
-//@CrossOrigin(allowedHeaders = "*",origins = "*")
+@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class AccountController {
 	@Autowired
 	private AccountService accountService;

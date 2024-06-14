@@ -19,7 +19,7 @@ import com.exptracker.enums.ExpendetureType;
 import com.exptracker.service.TransactionService;
 
 @RestController
-//@CrossOrigin(allowedHeaders = "*",origins = "*")
+@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class TransactionController {
 
 	@Autowired

@@ -19,7 +19,7 @@ import com.exptracker.entity.Customer;
 import com.exptracker.service.CustomerService;
 
 @RestController
-//@CrossOrigin(allowedHeaders = "*",origins = "*")
+@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class CustomerController {
 
 	@Autowired
